@@ -3,328 +3,1074 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Game Kuis Bimbingan Konseling</title>
+  <title>Roda Bintang BK: Kuis Guru BK Profesional</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Outfit"', 'sans-serif']
+          },
+          colors: {
+            bk: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              dark: '#0c4a6e'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    /* Reset & Tampilan Dasar */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
     body {
-      background-color: #f0f4f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at 10% 20%, #eff6ff 0%, #f5f3ff 90.2%);
       min-height: 100vh;
-      padding: 15px;
     }
-
-    /* Kotak Aplikasi */
-    .card {
-      background-color: #ffffff;
-      max-width: 500px;
-      width: 100%;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    .font-display {
+      font-family: 'Outfit', sans-serif;
     }
-
-    h1 {
-      font-size: 20px;
-      color: #1e3a8a;
-      text-align: center;
-      margin-bottom: 8px;
+    /* Animasi Lembut */
+    @keyframes pulse-subtle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
     }
-
-    p.subtitle {
-      font-size: 14px;
-      color: #64748b;
-      text-align: center;
-      margin-bottom: 20px;
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2s infinite ease-in-out;
     }
-
-    /* Input Data */
-    .form-group {
-      margin-bottom: 15px;
+    /* Pointer jarum roda */
+    .wheel-pointer {
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
     }
-
-    label {
-      display: block;
-      font-size: 14px;
-      color: #334155;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-    /* Tombol Utama */
-    .btn-main {
-      width: 100%;
-      background-color: #2563eb;
-      color: #ffffff;
-      border: none;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 15px;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .btn-main:hover {
-      background-color: #1d4ed8;
-    }
-
-    /* Area Kuis */
-    .badge {
-      display: inline-block;
-      background-color: #e0e7ff;
-      color: #3730a3;
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-
-    .question-text {
-      font-size: 16px;
-      color: #0f172a;
-      margin-bottom: 15px;
-      line-height: 1.5;
-    }
-
-    .options-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .option-btn {
-      text-align: left;
-      background-color: #f8fafc;
-      border: 1px solid #cbd5e1;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      line-height: 1.4;
-      transition: background 0.2s;
-    }
-
-    .option-btn:hover {
-      background-color: #e2e8f0;
-      border-color: #94a3b8;
-    }
-
-    /* Halaman Hasil */
-    .result-score {
-      text-align: center;
-      font-size: 40px;
-      font-weight: bold;
-      color: #16a34a;
-      margin: 15px 0 10px;
-    }
-
-    .result-feedback {
-      background-color: #f8fafc;
-      border-left: 4px solid #2563eb;
-      padding: 12px;
-      font-size: 14px;
-      color: #334155;
-      line-height: 1.5;
-      margin-bottom: 15px;
-    }
-
-    /* Utilitas Sembunyi */
-    .hidden {
-      display: none;
+    /* Tampilan Khusus Cetak Sertifikat */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #certificate-modal, #certificate-modal * {
+        visibility: visible;
+      }
+      #certificate-modal {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: white !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+      }
+      .no-print {
+        display: none !important;
+      }
     }
   </style>
 </head>
-<body>
+<body class="text-slate-800 antialiased flex flex-col justify-between min-h-screen">
 
-  <div class="card">
-    <!-- 1. HALAMAN PEMBUKA -->
-    <div id="screen-start">
-      <h1>Kuis Eksplorasi Diri (BK)</h1>
-      <p class="subtitle">Layanan Bimbingan Konseling Sekolah</p>
-
-      <div class="form-group">
-        <label for="nama">Nama Lengkap Siswa:</label>
-        <input type="text" id="nama" placeholder="Contoh: Budi Santoso">
+  <!-- Header / Navigation Bar -->
+  <header class="w-full bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 py-3 px-4 sm:px-8">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/30">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-display font-bold text-lg text-slate-900 leading-tight">BK Quest: Roda Profesional</h1>
+          <p class="text-xs text-slate-500 font-medium hidden sm:block">Kenali Karakter &amp; Integritas Guru BK Masa Kini</p>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="kelas">Kelas:</label>
-        <input type="text" id="kelas" placeholder="Contoh: VII A / VIII B">
+      <!-- Audio Mute/Unmute & Status -->
+      <div class="flex items-center gap-2">
+        <button id="btn-audio" onclick="toggleAudio()" class="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition flex items-center gap-2 shadow-sm text-xs font-semibold" title="Beralih Suara">
+          <span id="audio-icon">🔊</span>
+          <span class="hidden sm:inline" id="audio-label">Suara Aktif</span>
+        </button>
       </div>
-
-      <button class="btn-main" onclick="mulaiKuis()">Mulai Kuis</button>
     </div>
+  </header>
 
-    <!-- 2. HALAMAN KUIS -->
-    <div id="screen-quiz" class="hidden">
-      <div>
-        <span class="badge" id="soal-kategori">Bidang Layanan</span>
-      </div>
-      <p class="question-text" id="soal-teks">Pertanyaan akan muncul di sini...</p>
+  <main class="flex-grow flex items-center justify-center p-4 sm:p-6">
+    <div class="max-w-5xl w-full">
+
+      <!-- ================= SCREEN 1: PENDAFTARAN & AVATAR ================= -->
+      <section id="screen-reg" class="bg-white rounded-3xl shadow-xl shadow-sky-900/5 border border-slate-200/80 p-6 sm:p-10 max-w-xl mx-auto transition-all">
+        <div class="text-center mb-8">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-sky-100 text-sky-700 mb-3">
+            Eksplorasi Layanan BK
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900">Selamat Datang di Roda BK!</h2>
+          <p class="text-slate-600 text-sm mt-2">
+            Uji pemahamanmu tentang peran sejati Guru BK: bukan polisi sekolah, melainkan sahabat terbaik pengembangan potensimu!
+          </p>
+        </div>
+
+        <form id="form-daftar" onsubmit="mulaiPetualangan(event)" class="space-y-5">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Pilih Avatar Karakter</label>
+            <div class="grid grid-cols-4 gap-3" id="avatar-selector">
+              <label class="cursor-pointer">
+                <input type="radio" name="avatar" value="🎓" class="peer sr-only" checked>
+                <div class="p-3 text-2xl text-center rounded-2xl border-2 border-slate-200 peer-checked:border-sky-500 peer-checked:bg-sky-50 hover:bg-slate-50 transition">🎓</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="avatar" value="🌟" class="peer sr-only">
+                <div class="p-3 text-2xl text-center rounded-2xl border-2 border-slate-200 peer-checked:border-sky-500 peer-checked:bg-sky-50 hover:bg-slate-50 transition">🌟</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="avatar" value="🤝" class="peer sr-only">
+                <div class="p-3 text-2xl text-center rounded-2xl border-2 border-slate-200 peer-checked:border-sky-500 peer-checked:bg-sky-50 hover:bg-slate-50 transition">🤝</div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="avatar" value="🚀" class="peer sr-only">
+                <div class="p-3 text-2xl text-center rounded-2xl border-2 border-slate-200 peer-checked:border-sky-500 peer-checked:bg-sky-50 hover:bg-slate-50 transition">🚀</div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label for="input-nama" class="block text-xs font-bold uppercase text-slate-500 mb-1.5">Nama Lengkap Siswa</label>
+            <input type="text" id="input-nama" required placeholder="Contoh: Rian Pratama" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none text-sm transition">
+          </div>
+
+          <div>
+            <label for="input-kelas" class="block text-xs font-bold uppercase text-slate-500 mb-1.5">Kelas / Satuan Pendidikan</label>
+            <input type="text" id="input-kelas" required placeholder="Contoh: VIII-A / SMP Negeri 1" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none text-sm transition">
+          </div>
+
+          <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold rounded-xl shadow-lg shadow-sky-600/30 hover:from-sky-700 hover:to-indigo-700 active:scale-[0.99] transition flex items-center justify-center gap-2">
+            <span>Masuk ke Roda Kuis</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+        </form>
+      </section>
+
+      <!-- ================= SCREEN 2: GAMEPLAY RODA & STATISTIK ================= -->
+      <section id="screen-game" class="hidden transition-all">
+        <!-- HUD / Status Bar Pemain -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-3">
+            <span id="player-avatar-hud" class="text-3xl p-2 bg-sky-50 rounded-xl">🎓</span>
+            <div class="overflow-hidden">
+              <p class="text-xs text-slate-500 font-semibold uppercase">Peserta</p>
+              <h3 id="player-name-hud" class="text-sm font-bold text-slate-800 truncate">Siswa</h3>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-lg">⭐</div>
+            <div>
+              <p class="text-xs text-slate-500 font-semibold uppercase">Total Skor</p>
+              <h3 id="player-score-hud" class="text-lg font-extrabold text-amber-600 font-display">0 / 100</h3>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg">🎯</div>
+            <div>
+              <p class="text-xs text-slate-500 font-semibold uppercase">Tersisa</p>
+              <h3 id="player-remaining-hud" class="text-lg font-extrabold text-emerald-600 font-display">10 Soal</h3>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg">🔥</div>
+            <div>
+              <p class="text-xs text-slate-500 font-semibold uppercase">Streak Benar</p>
+              <h3 id="player-streak-hud" class="text-lg font-extrabold text-purple-600 font-display">0x</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layout Roda & Daftar Soal -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <!-- Kolom Roda Putar Interaktif -->
+          <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-xl shadow-slate-200/50 flex flex-col items-center">
+            
+            <div class="relative w-full max-w-[340px] sm:max-w-[380px] aspect-square flex items-center justify-center mb-6">
+              
+              <!-- Jarum Penunjuk Atas Roda -->
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-20 wheel-pointer">
+                <svg width="34" height="42" viewBox="0 0 34 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17 42L0 12C0 5.37258 7.61116 0 17 0C26.3888 0 34 5.37258 34 12L17 42Z" fill="#ef4444"/>
+                  <circle cx="17" cy="13" r="6" fill="#ffffff"/>
+                </svg>
+              </div>
+
+              <!-- Canvas Roda -->
+              <canvas id="wheel-canvas" width="400" height="400" class="w-full h-full rounded-full transition-transform duration-75"></canvas>
+
+              <!-- Pusat Tengah Roda -->
+              <div class="absolute w-16 h-16 rounded-full bg-white shadow-lg border-4 border-slate-100 flex items-center justify-center z-10">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                  BK
+                </div>
+              </div>
+            </div>
+
+            <!-- Tombol Putar Roda -->
+            <button id="btn-spin" onclick="putarRoda()" class="w-full sm:w-72 py-4 px-6 rounded-2xl bg-gradient-to-r from-sky-500 via-indigo-600 to-sky-600 text-white font-display font-bold text-lg shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 active:scale-95 transition flex items-center justify-center gap-3">
+              <svg class="w-6 h-6 animate-spin" id="spin-icon" style="display:none" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+              <span id="spin-text">PUTAR RODA SEKARANG!</span>
+            </button>
+            <p id="spin-hint" class="text-xs text-slate-500 mt-2 font-medium">Klik tombol untuk memilih topik kompetensi Guru BK berikutnya</p>
+          </div>
+
+          <!-- Kolom Status 10 Topik & Edukasi Cepat -->
+          <div class="lg:col-span-5 flex flex-col gap-4">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-lg shadow-slate-200/40">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-display font-bold text-slate-900 text-base">Indeks Topik Guru BK Profesional</h3>
+                <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 rounded-full text-slate-600" id="progress-tag">0 / 10 Tuntas</span>
+              </div>
+
+              <!-- List 10 Topik -->
+              <div class="grid grid-cols-1 gap-2 max-h-[360px] overflow-y-auto pr-1" id="topic-checklist">
+                <!-- Diisi otomatis oleh JavaScript -->
+              </div>
+            </div>
+
+            <!-- Kotak Info Cepat Guru BK -->
+            <div class="bg-gradient-to-br from-sky-50 to-indigo-50/60 rounded-3xl p-5 border border-sky-100">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">💡</span>
+                <div>
+                  <h4 class="font-bold text-xs uppercase tracking-wider text-sky-800">Tahukah Kamu?</h4>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                    Kode Etik Konseling Indonesia menjamin <strong>Asas Kerahasiaan</strong>. Segala hal yang kamu ceritakan kepada Guru BK tidak akan dibocorkan ke umum atau teman sebaya!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ================= SCREEN 3: RANGKUMAN & SERTIFIKAT ================= -->
+      <section id="screen-result" class="hidden max-w-2xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-2xl text-center transition-all">
+        <div class="w-20 h-20 mx-auto rounded-3xl bg-amber-100 text-amber-500 flex items-center justify-center text-4xl mb-4 shadow-inner">
+          🏆
+        </div>
+        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 mb-2" id="res-badge">
+          Duta Sahabat BK
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900" id="res-title">Selamat! Misi Selesai</h2>
+        <p class="text-sm text-slate-600 mt-1" id="res-subtitle">Kamu telah menuntaskan seluruh 10 eksplorasi Guru BK Profesional.</p>
+
+        <!-- Kartu Skor -->
+        <div class="my-6 p-6 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center justify-around gap-4">
+          <div>
+            <p class="text-xs text-slate-500 font-semibold uppercase">Nama Siswa</p>
+            <p class="font-bold text-slate-800 text-lg" id="res-name">-</p>
+            <p class="text-xs text-slate-500" id="res-class">-</p>
+          </div>
+          <div class="h-10 w-px bg-slate-200 hidden sm:block"></div>
+          <div>
+            <p class="text-xs text-slate-500 font-semibold uppercase">Total Nilai</p>
+            <p class="text-3xl font-extrabold text-sky-600 font-display" id="res-final-score">0 / 100</p>
+          </div>
+          <div class="h-10 w-px bg-slate-200 hidden sm:block"></div>
+          <div>
+            <p class="text-xs text-slate-500 font-semibold uppercase">Ketepatan Jawaban</p>
+            <p class="text-lg font-bold text-emerald-600" id="res-accuracy">0%</p>
+          </div>
+        </div>
+
+        <p class="text-sm text-slate-600 leading-relaxed text-left bg-sky-50/60 p-4 rounded-xl border border-sky-100 mb-6" id="res-eval-text">
+          -
+        </p>
+
+        <!-- Tombol Aksi Akhir -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button onclick="bukaSertifikat()" class="flex-1 py-3 px-5 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 text-white font-semibold shadow-md shadow-sky-600/30 hover:from-sky-700 hover:to-indigo-700 transition flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <span>Cetak / Simpan Sertifikat</span>
+          </button>
+          <button onclick="restartKuis()" class="py-3 px-5 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition">
+            Main Ulang
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODAL SOAL DAN PENJELASAN EDUKATIF -->
+  <div id="quiz-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 transform transition-all duration-200 scale-95 opacity-0" id="quiz-modal-content">
       
-      <div class="options-list" id="pilihan-jawaban">
-        <!-- Pilihan dibuat otomatis oleh JavaScript -->
-      </div>
-    </div>
-
-    <!-- 3. HALAMAN HASIL -->
-    <div id="screen-result" class="hidden">
-      <h1>Hasil Kuis BK</h1>
-      <p class="subtitle" id="hasil-identitas">Nama Siswa - Kelas</p>
-
-      <div class="result-score" id="hasil-skor">0</div>
-      <p style="text-align: center; font-size: 13px; color: #64748b; margin-bottom: 15px;">Skor Pemahaman Masalah</p>
-
-      <div class="result-feedback" id="hasil-catatan">
-        Catatan guru BK akan muncul di sini.
+      <!-- Header Modal -->
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <div class="flex items-center gap-2">
+          <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-xs" id="modal-q-num">1</span>
+          <span class="text-xs font-bold text-sky-700 uppercase tracking-wide" id="modal-q-topic">Topik BK</span>
+        </div>
+        <span class="text-xs font-semibold px-2 py-1 rounded bg-amber-50 text-amber-700 border border-amber-200" id="modal-q-points">+10 Poin</span>
       </div>
 
-      <button class="btn-main" onclick="ulangiKuis()">Main Lagi</button>
+      <!-- Teks Pertanyaan -->
+      <h3 class="text-base sm:text-lg font-bold text-slate-800 leading-snug mb-5" id="modal-q-text">
+        Pertanyaan kuis akan ditampilkan di sini...
+      </h3>
+
+      <!-- Opsi Pilihan Jawaban -->
+      <div class="space-y-2.5 mb-6" id="modal-options-list">
+        <!-- Disuntikkan via JS -->
+      </div>
+
+      <!-- Kotak Penjelasan Edukatif (Setelah Menjawab) -->
+      <div id="modal-explanation-box" class="hidden mb-6 p-4 rounded-2xl bg-slate-50 border transition-all text-left">
+        <div class="flex items-center gap-2 mb-1.5 font-bold text-xs uppercase" id="modal-exp-title">
+          <span>💡</span> Pembahasan Guru BK
+        </div>
+        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed" id="modal-exp-desc"></p>
+      </div>
+
+      <!-- Tombol Lanjut -->
+      <button id="modal-btn-next" onclick="tutupModalDanLanjut()" class="hidden w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition text-center">
+        Lanjutkan Petualangan
+      </button>
+
     </div>
   </div>
 
+  <!-- MODAL SERTIFIKAT DUTA SAHABAT BK -->
+  <div id="certificate-modal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="max-w-3xl w-full bg-white rounded-3xl p-6 sm:p-10 shadow-2xl relative border-8 border-double border-sky-600 my-auto text-center">
+      
+      <!-- Dekorasi Header Sertifikat -->
+      <div class="flex justify-between items-center no-print mb-4">
+        <button onclick="tutupSertifikat()" class="text-slate-400 hover:text-slate-700 text-sm font-semibold flex items-center gap-1">
+          ✕ Tutup
+        </button>
+        <button onclick="window.print()" class="px-4 py-2 bg-sky-600 text-white rounded-lg text-xs font-bold hover:bg-sky-700 transition flex items-center gap-2">
+          🖨️ Cetak / Unduh PDF
+        </button>
+      </div>
+
+      <div class="border-2 border-dashed border-sky-300 p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-sky-50/40 via-white to-indigo-50/30">
+        <!-- Logo / Cap -->
+        <div class="w-16 h-16 mx-auto mb-2 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 text-white flex items-center justify-center text-3xl shadow-md">
+          ⭐
+        </div>
+        <p class="text-xs font-bold uppercase tracking-widest text-sky-800">Kementerian Pendidikan Dasar &amp; Menengah</p>
+        <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 mt-1 uppercase tracking-tight">
+          Sertifikat Penghargaan
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 italic mt-0.5">Duta Sahabat &amp; Pemahaman Karakter Guru BK Profesional</p>
+
+        <div class="my-6">
+          <p class="text-xs text-slate-500 uppercase tracking-wider">Diberikan secara bangga kepada:</p>
+          <h3 class="text-xl sm:text-2xl font-display font-extrabold text-sky-700 mt-1 underline decoration-sky-300 underline-offset-4" id="cert-name">
+            Nama Siswa
+          </h3>
+          <p class="text-sm font-semibold text-slate-600 mt-1" id="cert-class">Kelas / Sekolah</p>
+        </div>
+
+        <p class="text-xs sm:text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+          Telah berhasil menyelesaikan 10 Eksplorasi Edukatif Peran &amp; Etika Guru BK dengan perolehan skor <strong class="text-sky-700 font-bold" id="cert-score">100/100</strong>, membuktikan pemahaman mendalam bahwa Guru Bimbingan Konseling adalah fasilitator, pendengar rahasia, serta mitra tumbuh kembang siswa di sekolah.
+        </p>
+
+        <!-- Tanda Tangan & Tanggal -->
+        <div class="mt-8 pt-6 border-t border-slate-200 grid grid-cols-2 gap-4 text-xs">
+          <div class="text-left pl-4">
+            <p class="text-slate-400">Tanggal Terbit:</p>
+            <p class="font-bold text-slate-700 mt-0.5" id="cert-date">-</p>
+            <div class="mt-6 text-slate-400 italic">[ Cap Resmi BK Sekolah ]</div>
+          </div>
+          <div class="text-right pr-4">
+            <p class="text-slate-400">Mengetahui,</p>
+            <p class="font-bold text-slate-700 mt-0.5">Koordinator Guru BK</p>
+            <div class="mt-10 font-bold text-slate-800 border-t border-slate-300 inline-block pt-1">
+              Konselor Sekolah (M.Pd., Kons.)
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-4 text-xs text-slate-400 border-t border-slate-200/80 bg-white/50 no-print">
+    <p>Aplikasi Bimbingan &amp; Konseling Terpadu &bull; Dirancang untuk Pembelajaran Karakter Siswa</p>
+  </footer>
+
   <script>
-    // Data Soal 4 Bidang Bimbingan Konseling
-    const daftarSoal = [
+    // ==========================================
+    // DATA 10 SOAL GURU BK PROFESIONAL
+    // ==========================================
+    const BANK_SOAL_BK = [
       {
-        kategori: "Pribadi",
-        pertanyaan: "Ketika kamu merasa sangat cemas atau tertekan menjelang ujian, langkah pertama yang paling sehat adalah...",
-        pilihan: [
-          { teks: "Menarik napas dalam secara perlahan dan beristirahat sejenak", skor: 25 },
-          { teks: "Memaksa belajar semalaman suntuk tanpa tidur sama sekali", skor: 0 },
-          { teks: "Menyalahkan diri sendiri dan mengabaikan perasaan tersebut", skor: 0 }
-        ]
+        id: 1,
+        nomor: 1,
+        topik: "Asas Kerahasiaan",
+        warna: "#0284c7", // Sky 600
+        soal: "Saat kamu menceritakan permasalahan pribadi yang sangat sensitif di ruang konseling, tindakan apa yang wajib dilakukan oleh Guru BK profesional?",
+        opsi: [
+          { teks: "Menceritakan masalahmu kepada teman sekelas sebagai bahan renungan bersama", poin: 0 },
+          { teks: "Menjaga kerahasiaan ceritamu rapat-rapat sesuai Kode Etik Konseling tanpa membocorkannya", poin: 10, benar: true },
+          { teks: "Menulis status di media sosial sekolah tanpa menyebut nama terang", poin: 0 },
+          { teks: "Menjadikan masalahmu sebagai topik obrolan santai di ruang guru", poin: 0 }
+        ],
+        penjelasan: "Asas Kerahasiaan adalah pilar utama bimbingan konseling (Kode Etik ABKIN). Guru BK berkewajiban melindungi segala data atau informasi rahasia siswa."
       },
       {
-        kategori: "Sosial",
-        pertanyaan: "Jika kamu melihat seorang teman di kelas diejek atau dikucilkan oleh teman lainnya, sikap yang tepat adalah...",
-        pilihan: [
-          { teks: "Ikut tertawa agar tidak menjadi sasaran berikutnya", skor: 0 },
-          { teks: "Mengajaknya bicara, memberi dukungan, dan melaporkan secara bijak ke guru", skor: 25 },
-          { teks: "Merekam kejadian tersebut untuk diunggah ke media sosial", skor: 0 }
-        ]
+        id: 2,
+        nomor: 2,
+        topik: "Bukan Polisi Sekolah",
+        warna: "#4f46e5", // Indigo 600
+        soal: "Masih banyak yang menganggap Guru BK adalah 'Polisi Sekolah'. Bagaimanakah peran Guru BK yang sesungguhnya?",
+        opsi: [
+          { teks: "Petugas khusus yang bertugas merazia tas, memotong rambut siswa, dan memberi hukuman fisik", poin: 0 },
+          { teks: "Hakim sekolah yang bertugas mengeluarkan siswa bermasalah secara sepihak", poin: 0 },
+          { teks: "Pendidik profesional yang mendampingi, memfasilitasi potensi, dan membantu pemecahan masalah siswa", poin: 10, benar: true },
+          { teks: "Pengawas kedisiplinan yang kerjanya berkeliling mencari kesalahan siswa", poin: 0 }
+        ],
+        penjelasan: "Guru BK bukanlah algojo atau penegak sanksi disiplin fisik. Guru BK adalah fasilitator empati yang membantu siswa memahami diri dan memperbaiki perilakunya."
       },
       {
-        kategori: "Belajar",
-        pertanyaan: "Cara mengatur waktu belajar yang efektif saat banyak tugas rumah adalah...",
-        pilihan: [
-          { teks: "Mengerjakan semua tugas saat menit-menit terakhir sebelum dikumpulkan", skor: 0 },
-          { teks: "Membuat daftar prioritas mulai dari yang paling mendesak dan penting", skor: 25 },
-          { teks: "Menunggu suasana hati (mood) merasa ingin belajar", skor: 0 }
-        ]
+        id: 3,
+        nomor: 3,
+        topik: "Keterbukaan Layanan",
+        warna: "#059669", // Emerald 600
+        soal: "Siapakah yang boleh datang berkunjung dan memanfaatkan layanan di ruang Bimbingan Konseling (BK)?",
+        opsi: [
+          { teks: "Hanya siswa yang kedapatan membolos dan sering melanggar tata tertib", poin: 0 },
+          { teks: "Semua siswa yang ingin curhat, berkonsultasi karir, belajar, maupun meningkatkan potensi diri", poin: 10, benar: true },
+          { teks: "Hanya siswa yang dipanggil lewat surat panggilan khusus dari kepala sekolah", poin: 0 },
+          { teks: "Hanya siswa berprestasi yang akan dikirim ke perlombaan olimpiade", poin: 0 }
+        ],
+        penjelasan: "Layanan BK bersifat universal untuk SELURUH siswa (bimbingan perkembangan), bukan sekadar penanganan reaktif bagi siswa yang melanggar aturan."
       },
       {
-        kategori: "Karir",
-        pertanyaan: "Langkah terbaik dalam menentukan rencana kelanjutan studi atau cita-cita karir adalah...",
-        pilihan: [
-          { teks: "Mengenali bakat, minat, serta berkonsultasi dengan orang tua dan guru BK", skor: 25 },
-          { teks: "Hanya ikut-ikutan pilihan teman terdekat agar tetap bersama", skor: 0 },
-          { teks: "Memilih jurusan secara acak tanpa mencari tahu prospeknya", skor: 0 }
-        ]
+        id: 4,
+        nomor: 4,
+        topik: "Asas Kesukarelaan",
+        warna: "#d97706", // Amber 600
+        soal: "Dalam pelaksanaan konseling individual, apa yang dimaksud dengan Asas Kesukarelaan dan Keterbukaan?",
+        opsi: [
+          { teks: "Siswa dipaksa menandatangani surat perjanjian sebelum boleh berbicara", poin: 0 },
+          { teks: "Siswa datang dan menyampaikan isi hatinya dengan sukarela serta terbuka tanpa rasa takut", poin: 10, benar: true },
+          { teks: "Guru BK berhak memeriksa pesan WhatsApp siswa secara diam-diam", poin: 0 },
+          { teks: "Konseling hanya boleh dilakukan jika ada imbalan hadiah sukarela", poin: 0 }
+        ],
+        penjelasan: "Konseling yang efektif dilandasi oleh niat sukarela siswa dan keterbukaan tanpa tekanan, sehingga terjalin rasa saling percaya (*rapport*) antara siswa dan konselor."
+      },
+      {
+        id: 5,
+        nomor: 5,
+        topik: "Bimbingan Karir",
+        warna: "#7c3aed", // Violet 600
+        soal: "Bagaimana cara Guru BK profesional membantumu saat kamu bingung menentukan pilihan jurusan atau cita-cita masa depan?",
+        opsi: [
+          { teks: "Memaksa semua siswa memilih jurusan yang sama dengan jurusan favorit guru", poin: 0 },
+          { teks: "Membantu mengeksplorasi minat, bakat, tes kepribadian, serta memberikan wawasan jalur studi lanjutan", poin: 10, benar: true },
+          { teks: "Menyarankan siswa mengikuti pilihan teman dekatnya saja agar tidak kesepian", poin: 0 },
+          { teks: "Menyuruh siswa mengundi nasib tanpa perlu melakukan perencanaan karir", poin: 0 }
+        ],
+        penjelasan: "Bimbingan Karir BK membantu siswa mengenal potensi bakat, minat, tipe kepribadian, dan informasi dunia kerja agar mampu mengambil keputusan karir yang tepat."
+      },
+      {
+        id: 6,
+        nomor: 6,
+        topik: "Bimbingan Belajar",
+        warna: "#0891b2", // Cyan 600
+        soal: "Jika kamu mengalami sindrom 'Sistem Kebut Semalam' (SKS) dan sering menunda tugas hingga stres, apa solusi yang difasilitasi Guru BK?",
+        opsi: [
+          { teks: "Membantu menyusun manajemen waktu, teknik fokus Pomodoro, dan mengenali gaya belajar yang tepat", poin: 10, benar: true },
+          { teks: "Mengerjakan seluruh tugas sekolahmu agar kamu tidak stres lagi", poin: 0 },
+          { teks: "Menyuruhmu berhenti sekolah karena dianggap tidak mampu belajar", poin: 0 },
+          { teks: "Mengabaikannya karena urusan belajar hanya tanggung jawab guru mata pelajaran", poin: 0 }
+        ],
+        penjelasan: "Bidang Bimbingan Belajar membekali siswa dengan keterampilan manajemen waktu, mengatasi prokrastinasi, dan menemukan strategi belajar yang menyenangkan."
+      },
+      {
+        id: 7,
+        nomor: 7,
+        topik: "Pencegahan Bullying",
+        warna: "#e11d48", // Rose 600
+        soal: "Melihat situasi perundungan (bullying) di lingkungan sekolah, langkah tindakan nyata yang diambil Guru BK profesional adalah:",
+        opsi: [
+          { teks: "Menyalahkan korban karena dianggap terlalu lemah atau sensitif", poin: 0 },
+          { teks: "Melindungi korban, membimbing pelaku untuk mengubah perilakunya, dan membangun iklim sekolah yang aman", poin: 10, benar: true },
+          { teks: "Membiarkan kejadian tersebut karena dianggap bagian dari candaan remaja biasa", poin: 0 },
+          { teks: "Mengunggah video perundungan ke media sosial agar pelakunya mendapat sanksi sosial", poin: 0 }
+        ],
+        penjelasan: "Guru BK mengedepankan fungsi pencegahan dan perlindungan, mengedukasi siswa menjadi *Upstander* (bukan penonton), serta mendampingi korban dan memulihkan perilaku pelaku."
+      },
+      {
+        id: 8,
+        nomor: 8,
+        topik: "Kemandirian Solusi",
+        warna: "#2563eb", // Blue 600
+        soal: "Dalam proses konseling tatap muka, apakah Guru BK bertugas langsung mendiktekan apa yang harus kamu lakukan dalam hidup?",
+        opsi: [
+          { teks: "Ya, Guru BK yang menentukan seluruh jalan hidup siswa tanpa perlu mendengar pendapat siswa", poin: 0 },
+          { teks: "Tidak, Guru BK memfasilitasi agar siswa mampu memahami masalah dan menemukan alternatif solusi mandiri", poin: 10, benar: true },
+          { teks: "Ya, karena siswa masih di bawah umur dan belum berhak mengambil keputusan apa pun", poin: 0 },
+          { teks: "Tidak, Guru BK hanya bertugas mendengarkan tanpa memberikan respon atau arahan sama sekali", poin: 0 }
+        ],
+        penjelasan: "Tujuan akhir bimbingan dan konseling adalah kemandirian siswa (*self-reliance*). Guru BK menuntun dan memberi alternatif wawasan, sementara keputusan akhir tetap diambil secara bertanggung jawab oleh siswa."
+      },
+      {
+        id: 9,
+        nomor: 9,
+        topik: "Kolaborasi Sekolah",
+        warna: "#0d9488", // Teal 600
+        soal: "Bagaimana Guru BK menjalin komunikasi dengan orang tua siswa dan guru mata pelajaran?",
+        opsi: [
+          { teks: "Hanya menghubungi orang tua saat hendak menagih denda atau memberi surat ancaman skor dikeluarkan", poin: 0 },
+          { teks: "Bermitra secara positif untuk memantau tumbuh kembang dan memberikan dukungan optimal bagi siswa", poin: 10, benar: true },
+          { teks: "Menolak berbicara dengan orang tua karena dianggap mencampuri urusan sekolah", poin: 0 },
+          { teks: "Mengadu domba siswa dengan orang tuanya di rumah", poin: 0 }
+        ],
+        penjelasan: "Guru BK profesional bekerja secara kolaboratif (*triad*) antara konselor, wali murid, dan dewan guru guna menciptakan ekosistem belajar yang suportif bagi tumbuh kembang siswa."
+      },
+      {
+        id: 10,
+        nomor: 10,
+        topik: "Asas Keahlian",
+        warna: "#9333ea", // Purple 600
+        soal: "Apa latar belakang kompetensi dan keahlian yang dimiliki oleh seorang Guru BK yang profesional?",
+        opsi: [
+          { teks: "Siapa saja yang memiliki waktu luang di sekolah tanpa perlu latar belakang pendidikan ilmu konseling", poin: 0 },
+          { teks: "Lulusan Sarjana Bimbingan dan Konseling (S.Pd / Kons) yang menguasai teknik asesmen, psikologi, dan etika konseling", poin: 10, benar: true },
+          { teks: "Hanya guru olahraga yang pandai menegur siswa saat upacara bendera", poin: 0 },
+          { teks: "Petugas keamanan sekolah yang diberi seragam guru", poin: 0 }
+        ],
+        penjelasan: "Asas Keahlian menegaskan bahwa layanan BK diselenggarakan oleh tenaga ahli berlatar belakang akademik Sarjana Bimbingan Konseling yang memiliki kompetensi pedagogik, kepribadian, sosial, dan profesional."
       }
     ];
 
-    let indeksSoal = 0;
-    let totalSkor = 0;
-    let namaSiswa = "";
-    let kelasSiswa = "";
+    // State Aplikasi
+    let state = {
+      nama: "",
+      kelas: "",
+      avatar: "🎓",
+      skor: 0,
+      soalSelesai: [], // Array ID soal yang sudah selesai
+      streak: 0,
+      soalAktif: null,
+      audioAktif: true,
+      sedangMemutar: false
+    };
 
-    // Fungsi Mulai Kuis
-    function mulaiKuis() {
-      namaSiswa = document.getElementById("nama").value.trim();
-      kelasSiswa = document.getElementById("kelas").value.trim();
+    // Web Audio API Synthesizer (Bebas dari dependensi link mp3 eksternal)
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
 
-      if (!namaSiswa || !kelasSiswa) {
-        alert("Silakan isi nama dan kelas terlebih dahulu!");
+    function playSound(type) {
+      if (!state.audioAktif) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'tick') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(450, now);
+          osc.frequency.exponentialRampToValueAtTime(150, now + 0.05);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+          osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.setValueAtTime(130, now + 0.15);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'fanfare') {
+          // Kemenangan di akhir
+          const chords = [523.25, 659.25, 783.99, 1046.50];
+          chords.forEach((freq, i) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(freq, now + (i * 0.1));
+            g.gain.setValueAtTime(0.2, now + (i * 0.1));
+            g.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+            o.start(now + (i * 0.1));
+            o.stop(now + 1.2);
+          });
+        }
+      } catch (err) {
+        console.warn("Audio Context terkendala browser:", err);
+      }
+    }
+
+    function toggleAudio() {
+      state.audioAktif = !state.audioAktif;
+      document.getElementById('audio-icon').textContent = state.audioAktif ? '🔊' : '🔇';
+      document.getElementById('audio-label').textContent = state.audioAktif ? 'Suara Aktif' : 'Mute';
+      if (state.audioAktif) playSound('tick');
+    }
+
+    // ==========================================
+    // RENDER RODA KANVAS (WHEEL LOGIC)
+    // ==========================================
+    const canvas = document.getElementById('wheel-canvas');
+    const ctx = canvas.getContext('2d');
+    let currentAngle = 0; // dalam radian
+    const numSectors = BANK_SOAL_BK.length;
+    const arc = (2 * Math.PI) / numSectors;
+
+    function gambarRoda(sudutRotasi = 0) {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.width / 2 - 12;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < numSectors; i++) {
+        const item = BANK_SOAL_BK[i];
+        const angle = sudutRotasi + (i * arc);
+        const sudahSelesai = state.soalSelesai.includes(item.id);
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, angle, angle + arc, false);
+        ctx.lineTo(centerX, centerY);
+
+        // Warna segmen (jika selesai, dibuat sedikit redup tapi tetap jelas)
+        if (sudahSelesai) {
+          ctx.fillStyle = "#cbd5e1"; // Slate 300
+        } else {
+          ctx.fillStyle = item.warna;
+        }
+        ctx.fill();
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "#ffffff";
+        ctx.stroke();
+
+        // Teks Nomor dan Simbol
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = sudahSelesai ? "#64748b" : "#ffffff";
+        ctx.font = "bold 15px 'Outfit', sans-serif";
+
+        const labelText = sudahSelesai ? `✓ #${item.nomor}` : `#${item.nomor}`;
+        ctx.fillText(labelText, radius - 24, 6);
+
+        ctx.restore();
+      }
+
+      // Border lingkaran luar
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#e2e8f0";
+      ctx.stroke();
+    }
+
+    function putarRoda() {
+      if (state.sedangMemutar) return;
+
+      const soalBelum = BANK_SOAL_BK.filter(s => !state.soalSelesai.includes(s.id));
+      if (soalBelum.length === 0) {
+        tampilkanHasilAkhir();
         return;
       }
 
-      indeksSoal = 0;
-      totalSkor = 0;
+      initAudio();
+      state.sedangMemutar = true;
 
-      document.getElementById("screen-start").classList.add("hidden");
-      document.getElementById("screen-result").classList.add("hidden");
-      document.getElementById("screen-quiz").classList.remove("hidden");
+      const btnSpin = document.getElementById('btn-spin');
+      const spinText = document.getElementById('spin-text');
+      const spinIcon = document.getElementById('spin-icon');
 
-      tampilkanSoal();
+      btnSpin.disabled = true;
+      btnSpin.classList.add('opacity-80', 'cursor-not-allowed');
+      spinText.textContent = "MEMUTAR...";
+      spinIcon.style.display = "inline-block";
+
+      // Pilih secara acak dari soal yang belum tuntas
+      const targetSoal = soalBelum[Math.floor(Math.random() * soalBelum.length)];
+      const targetIndex = BANK_SOAL_BK.findIndex(s => s.id === targetSoal.id);
+
+      // Hitung sudut rotasi agar jarum penunjuk (berada di posisi ATAS = 1.5 * PI) berhenti tepat di segmen terpilih
+      // Segmen i berada di tengah: currentAngle + i*arc + arc/2 = 1.5*PI
+      const targetAngleAtPointer = (1.5 * Math.PI) - (targetIndex * arc) - (arc / 2);
+      
+      // Tambahkan minimal 5 putaran penuh (10 * PI) agar berputar seru
+      const putaranExtra = (5 + Math.floor(Math.random() * 3)) * (2 * Math.PI);
+      const startAngle = currentAngle % (2 * Math.PI);
+      const finalAngle = startAngle + putaranExtra + (targetAngleAtPointer - (startAngle % (2 * Math.PI)));
+
+      const durasi = 4200; // 4.2 detik
+      const startTime = performance.now();
+      let lastTickTime = 0;
+
+      function animasikan(waktuSekarang) {
+        const elapsed = waktuSekarang - startTime;
+        const progress = Math.min(elapsed / durasi, 1);
+        
+        // Easing cubic out
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const angleSekarang = startAngle + (finalAngle - startAngle) * easeOut;
+
+        gambarRoda(angleSekarang);
+
+        // Suara tik saat melewati batas segmen
+        if (waktuSekarang - lastTickTime > 90 && progress < 0.95) {
+          playSound('tick');
+          lastTickTime = waktuSekarang;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(animasikan);
+        } else {
+          currentAngle = finalAngle;
+          gambarRoda(currentAngle);
+          state.sedangMemutar = false;
+          btnSpin.disabled = false;
+          btnSpin.classList.remove('opacity-80', 'cursor-not-allowed');
+          spinText.textContent = "PUTAR RODA LAGI";
+          spinIcon.style.display = "none";
+
+          setTimeout(() => {
+            bukaModalSoal(targetSoal);
+          }, 350);
+        }
+      }
+
+      requestAnimationFrame(animasikan);
     }
 
-    // Menampilkan Soal Saat Ini
-    function tampilkanSoal() {
-      const soalSaatIni = daftarSoal[indeksSoal];
+    function mulaiPetualangan(e) {
+      e.preventDefault();
+      const nama = document.getElementById('input-nama').value.trim();
+      const kelas = document.getElementById('input-kelas').value.trim();
+      const avatarChecked = document.querySelector('input[name="avatar"]:checked');
 
-      document.getElementById("soal-kategori").textContent = "Bidang " + soalSaatIni.kategori + ` (${indeksSoal + 1}/${daftarSoal.length})`;
-      document.getElementById("soal-teks").textContent = soalSaatIni.pertanyaan;
+      if (!nama || !kelas) return;
 
-      const kontainerPilihan = document.getElementById("pilihan-jawaban");
-      kontainerPilihan.innerHTML = "";
+      state.nama = nama;
+      state.kelas = kelas;
+      state.avatar = avatarChecked ? avatarChecked.value : "🎓";
+      state.skor = 0;
+      state.soalSelesai = [];
+      state.streak = 0;
 
-      soalSaatIni.pilihan.forEach((pilihan) => {
-        const tombol = document.createElement("button");
-        tombol.className = "option-btn";
-        tombol.textContent = pilihan.teks;
-        tombol.onclick = () => pilihJawaban(pilihan.skor);
-        kontainerPilihan.appendChild(tombol);
+      // Update Tampilan HUD
+      document.getElementById('player-name-hud').textContent = state.nama;
+      document.getElementById('player-avatar-hud').textContent = state.avatar;
+      updateHUD();
+      renderChecklistTopik();
+      gambarRoda(0);
+
+      // Transisi Layar
+      document.getElementById('screen-reg').classList.add('hidden');
+      document.getElementById('screen-game').classList.remove('hidden');
+
+      initAudio();
+      playSound('tick');
+    }
+
+    function updateHUD() {
+      document.getElementById('player-score-hud').textContent = `${state.skor} / 100`;
+      const sisa = BANK_SOAL_BK.length - state.soalSelesai.length;
+      document.getElementById('player-remaining-hud').textContent = `${sisa} Soal`;
+      document.getElementById('player-streak-hud').textContent = `${state.streak}x`;
+      document.getElementById('progress-tag').textContent = `${state.soalSelesai.length} / 10 Tuntas`;
+    }
+
+    function renderChecklistTopik() {
+      const container = document.getElementById('topic-checklist');
+      container.innerHTML = "";
+
+      BANK_SOAL_BK.forEach(item => {
+        const selesai = state.soalSelesai.includes(item.id);
+        const div = document.createElement('div');
+        div.className = `flex items-center justify-between p-2.5 rounded-xl border text-xs transition ${
+          selesai ? 'bg-slate-50 border-slate-200 text-slate-400' : 'bg-white border-slate-200/80 text-slate-700 shadow-sm'
+        }`;
+
+        div.innerHTML = `
+          <div class="flex items-center gap-2 truncate">
+            <span class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ${
+              selesai ? 'bg-emerald-100 text-emerald-700' : 'bg-sky-100 text-sky-700'
+            }">
+              ${selesai ? '✓' : item.nomor}
+            </span>
+            <span class="font-medium truncate">${item.topik}</span>
+          </div>
+          <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${
+            selesai ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'
+          }">${selesai ? 'Selesai' : 'Siap'}</span>
+        `;
+        container.appendChild(div);
       });
     }
 
-    // Logika Pemilihan Jawaban
-    function pilihJawaban(poin) {
-      totalSkor += poin;
-      indeksSoal++;
+    function bukaModalSoal(soal) {
+      state.soalAktif = soal;
 
-      if (indeksSoal < daftarSoal.length) {
-        tampilkanSoal();
+      document.getElementById('modal-q-num').textContent = `#${soal.nomor}`;
+      document.getElementById('modal-q-topic').textContent = soal.topik;
+      document.getElementById('modal-q-text').textContent = soal.soal;
+
+      const optionsList = document.getElementById('modal-options-list');
+      optionsList.innerHTML = "";
+
+      const expBox = document.getElementById('modal-explanation-box');
+      expBox.classList.add('hidden');
+      const btnNext = document.getElementById('modal-btn-next');
+      btnNext.classList.add('hidden');
+
+      // Tampilkan Opsi Pilihan
+      soal.opsi.forEach((opt, idx) => {
+        const huruf = String.fromCharCode(65 + idx);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = "w-full text-left p-3.5 sm:p-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 transition text-xs sm:text-sm font-medium text-slate-700 flex items-start gap-3 option-choice";
+        btn.innerHTML = `
+          <span class="w-6 h-6 rounded-lg bg-slate-100 text-slate-600 flex-shrink-0 flex items-center justify-center font-bold text-xs">${huruf}</span>
+          <span class="flex-grow pt-0.5">${opt.teks}</span>
+        `;
+
+        btn.onclick = () => verifikasiJawaban(btn, opt, soal);
+        optionsList.appendChild(btn);
+      });
+
+      // Tampilkan Modal
+      const modal = document.getElementById('quiz-modal');
+      const modalContent = document.getElementById('quiz-modal-content');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+      }, 20);
+    }
+
+    function verifikasiJawaban(btnDipilih, opsiDipilih, soal) {
+      // Nonaktifkan semua pilihan
+      const allBtns = document.querySelectorAll('.option-choice');
+      allBtns.forEach(b => {
+        b.disabled = true;
+        b.classList.remove('hover:bg-slate-50', 'hover:border-slate-300');
+      });
+
+      const isBenar = opsiDipilih.benar === true;
+
+      if (isBenar) {
+        state.skor += 10;
+        state.streak += 1;
+        playSound('correct');
+
+        btnDipilih.classList.remove('bg-white', 'border-slate-200');
+        btnDipilih.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-900');
+        btnDipilih.querySelector('span').classList.add('bg-emerald-500', 'text-white');
+
+        // Confetti mini
+        try {
+          confetti({
+            particleCount: 30,
+            spread: 60,
+            origin: { y: 0.6 }
+          });
+        } catch(e) {}
       } else {
-        tampilkanHasil();
+        state.streak = 0;
+        playSound('wrong');
+
+        btnDipilih.classList.remove('bg-white', 'border-slate-200');
+        btnDipilih.classList.add('bg-rose-50', 'border-rose-400', 'text-rose-900');
+        btnDipilih.querySelector('span').classList.add('bg-rose-500', 'text-white');
+
+        // Beri tanda pada jawaban yang benar
+        allBtns.forEach((b, idx) => {
+          if (soal.opsi[idx].benar) {
+            b.classList.remove('bg-white', 'border-slate-200');
+            b.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-900');
+            b.querySelector('span').classList.add('bg-emerald-500', 'text-white');
+          }
+        });
       }
-    }
 
-    // Menampilkan Layar Skor
-    function tampilkanHasil() {
-      document.getElementById("screen-quiz").classList.add("hidden");
-      document.getElementById("screen-result").classList.remove("hidden");
+      // Catat sebagai selesai
+      if (!state.soalSelesai.includes(soal.id)) {
+        state.soalSelesai.push(soal.id);
+      }
 
-      document.getElementById("hasil-identitas").textContent = `${namaSiswa} (${kelasSiswa})`;
-      document.getElementById("hasil-skor").textContent = totalSkor;
+      // Update Tampilan Edukasi
+      const expBox = document.getElementById('modal-explanation-box');
+      const expTitle = document.getElementById('modal-exp-title');
+      const expDesc = document.getElementById('modal-exp-desc');
 
-      let catatan = "";
-      if (totalSkor >= 75) {
-        catatan = "Hebat! Kamu memiliki pemahaman diri, sosial, dan cara belajar yang sangat matang. Pertahankan sikap positif ini!";
-      } else if (totalSkor >= 50) {
-        catatan = "Cukup baik. Ada beberapa bagian yang masih perlu dilatih kembali, seperti pengelolaan waktu belajar atau ketenangan emosi.";
+      if (isBenar) {
+        expBox.className = "mb-6 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-left";
+        expTitle.className = "flex items-center gap-1.5 font-bold text-xs uppercase text-emerald-800 mb-1";
+        expTitle.innerHTML = "✨ Tepat Sekali! Refleksi Guru BK";
       } else {
-        catatan = "Jangan berkecil hati. Jadikan hasil ini kesempatan untuk belajar lebih banyak. Guru BK siap membantu dan berdiskusi kapan saja!";
+        expBox.className = "mb-6 p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-left";
+        expTitle.className = "flex items-center gap-1.5 font-bold text-xs uppercase text-amber-800 mb-1";
+        expTitle.innerHTML = "💡 Penjelasan Karakter Guru BK";
       }
 
-      document.getElementById("hasil-catatan").textContent = catatan;
+      expDesc.textContent = soal.penjelasan;
+      expBox.classList.remove('hidden');
+
+      const btnNext = document.getElementById('modal-btn-next');
+      btnNext.classList.remove('hidden');
+
+      updateHUD();
+      renderChecklistTopik();
+      gambarRoda(currentAngle);
     }
 
-    // Mengulang Kuis
-    function ulangiKuis() {
-      document.getElementById("nama").value = "";
-      document.getElementById("kelas").value = "";
-      document.getElementById("screen-result").classList.add("hidden");
-      document.getElementById("screen-start").classList.remove("hidden");
+    function tutupModalDanLanjut() {
+      const modal = document.getElementById('quiz-modal');
+      const modalContent = document.getElementById('quiz-modal-content');
+
+      modalContent.classList.remove('scale-100', 'opacity-100');
+      modalContent.classList.add('scale-95', 'opacity-0');
+
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        // Jika semua 10 soal sudah selesai, lanjut ke layar ringkasan
+        if (state.soalSelesai.length >= BANK_SOAL_BK.length) {
+          tampilkanHasilAkhir();
+        }
+      }, 200);
     }
+
+    function tampilkanHasilAkhir() {
+      document.getElementById('screen-game').classList.add('hidden');
+      const resScreen = document.getElementById('screen-result');
+      resScreen.classList.remove('hidden');
+
+      document.getElementById('res-name').textContent = state.nama;
+      document.getElementById('res-class').textContent = state.kelas;
+      document.getElementById('res-final-score').textContent = `${state.skor} / 100`;
+
+      const akurasi = Math.round((state.skor / 100) * 100);
+      document.getElementById('res-accuracy').textContent = `${akurasi}%`;
+
+      const badgeEl = document.getElementById('res-badge');
+      const titleEl = document.getElementById('res-title');
+      const evalTextEl = document.getElementById('res-eval-text');
+
+      if (state.skor >= 90) {
+        badgeEl.textContent = "Duta Sahabat Utama BK";
+        badgeEl.className = "inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 mb-2";
+        titleEl.textContent = "Luar Biasa! Pemahaman Sangat Matang";
+        evalTextEl.textContent = "Kamu memahami dengan sempurna bahwa Guru BK adalah sahabat siswa, penjaga rahasia yang amanah, dan fasilitator masa depan tanpa stigma hukuman. Teruslah menjadi teladan dan rangkul teman-temanmu untuk tidak ragu memanfaatkan ruang BK!";
+      } else if (state.skor >= 70) {
+        badgeEl.textContent = "Sahabat Peduli BK";
+        badgeEl.className = "inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800 mb-2";
+        titleEl.textContent = "Bagus Sekali! Pemahaman Terbina";
+        evalTextEl.textContent = "Kamu sudah mengenali sebagian besar prinsip dan etika layanan bimbingan konseling. Ingatlah bahwa ruang BK senantiasa terbuka untuk seluruh siswa, baik dalam pengembangan karir, teknik belajar, maupun kesehatan mental.";
+      } else {
+        badgeEl.textContent = "Teman Belajar BK";
+        badgeEl.className = "inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 mb-2";
+        titleEl.textContent = "Tetap Semangat! Ruang BK Siap Membimbing";
+        evalTextEl.textContent = "Kuis ini membantumu meluruskan stigma masa lalu. Sekarang kamu tahu bahwa Guru BK bukanlah polisi sekolah, melainkan pendengar yang siap mendukung setiap langkah belajarmu.";
+      }
+
+      playSound('fanfare');
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 80,
+          origin: { y: 0.5 }
+        });
+      } catch(e) {}
+    }
+
+    function bukaSertifikat() {
+      document.getElementById('cert-name').textContent = state.nama;
+      document.getElementById('cert-class').textContent = state.kelas;
+      document.getElementById('cert-score').textContent = `${state.skor} / 100`;
+
+      const options = { day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('cert-date').textContent = new Date().toLocaleDateString('id-ID', options);
+
+      const certModal = document.getElementById('certificate-modal');
+      certModal.classList.remove('hidden');
+      certModal.classList.add('flex');
+    }
+
+    function tutupSertifikat() {
+      const certModal = document.getElementById('certificate-modal');
+      certModal.classList.add('hidden');
+      certModal.classList.remove('flex');
+    }
+
+    function restartKuis() {
+      state.skor = 0;
+      state.soalSelesai = [];
+      state.streak = 0;
+      currentAngle = 0;
+
+      document.getElementById('screen-result').classList.add('hidden');
+      document.getElementById('screen-reg').classList.remove('hidden');
+      document.getElementById('input-nama').value = "";
+      document.getElementById('input-kelas').value = "";
+    }
+
+    // Inisialisasi awal saat window dimuat
+    window.onload = function() {
+      gambarRoda(0);
+    };
   </script>
 </body>
 </html>
