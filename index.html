@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Kuis Bimbingan Konseling</title>
+  <style>
+    /* Reset & Tampilan Dasar */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background-color: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+
+    /* Kotak Aplikasi */
+    .card {
+      background-color: #ffffff;
+      max-width: 500px;
+      width: 100%;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 20px;
+      color: #1e3a8a;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    p.subtitle {
+      font-size: 14px;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Input Data */
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      color: #334155;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* Tombol Utama */
+    .btn-main {
+      width: 100%;
+      background-color: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .btn-main:hover {
+      background-color: #1d4ed8;
+    }
+
+    /* Area Kuis */
+    .badge {
+      display: inline-block;
+      background-color: #e0e7ff;
+      color: #3730a3;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .question-text {
+      font-size: 16px;
+      color: #0f172a;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option-btn {
+      text-align: left;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      line-height: 1.4;
+      transition: background 0.2s;
+    }
+
+    .option-btn:hover {
+      background-color: #e2e8f0;
+      border-color: #94a3b8;
+    }
+
+    /* Halaman Hasil */
+    .result-score {
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #16a34a;
+      margin: 15px 0 10px;
+    }
+
+    .result-feedback {
+      background-color: #f8fafc;
+      border-left: 4px solid #2563eb;
+      padding: 12px;
+      font-size: 14px;
+      color: #334155;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    /* Utilitas Sembunyi */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <!-- 1. HALAMAN PEMBUKA -->
+    <div id="screen-start">
+      <h1>Kuis Eksplorasi Diri (BK)</h1>
+      <p class="subtitle">Layanan Bimbingan Konseling Sekolah</p>
+
+      <div class="form-group">
+        <label for="nama">Nama Lengkap Siswa:</label>
+        <input type="text" id="nama" placeholder="Contoh: Budi Santoso">
+      </div>
+
+      <div class="form-group">
+        <label for="kelas">Kelas:</label>
+        <input type="text" id="kelas" placeholder="Contoh: VII A / VIII B">
+      </div>
+
+      <button class="btn-main" onclick="mulaiKuis()">Mulai Kuis</button>
+    </div>
+
+    <!-- 2. HALAMAN KUIS -->
+    <div id="screen-quiz" class="hidden">
+      <div>
+        <span class="badge" id="soal-kategori">Bidang Layanan</span>
+      </div>
+      <p class="question-text" id="soal-teks">Pertanyaan akan muncul di sini...</p>
+      
+      <div class="options-list" id="pilihan-jawaban">
+        <!-- Pilihan dibuat otomatis oleh JavaScript -->
+      </div>
+    </div>
+
+    <!-- 3. HALAMAN HASIL -->
+    <div id="screen-result" class="hidden">
+      <h1>Hasil Kuis BK</h1>
+      <p class="subtitle" id="hasil-identitas">Nama Siswa - Kelas</p>
+
+      <div class="result-score" id="hasil-skor">0</div>
+      <p style="text-align: center; font-size: 13px; color: #64748b; margin-bottom: 15px;">Skor Pemahaman Masalah</p>
+
+      <div class="result-feedback" id="hasil-catatan">
+        Catatan guru BK akan muncul di sini.
+      </div>
+
+      <button class="btn-main" onclick="ulangiKuis()">Main Lagi</button>
+    </div>
+  </div>
+
+  <script>
+    // Data Soal 4 Bidang Bimbingan Konseling
+    const daftarSoal = [
+      {
+        kategori: "Pribadi",
+        pertanyaan: "Ketika kamu merasa sangat cemas atau tertekan menjelang ujian, langkah pertama yang paling sehat adalah...",
+        pilihan: [
+          { teks: "Menarik napas dalam secara perlahan dan beristirahat sejenak", skor: 25 },
+          { teks: "Memaksa belajar semalaman suntuk tanpa tidur sama sekali", skor: 0 },
+          { teks: "Menyalahkan diri sendiri dan mengabaikan perasaan tersebut", skor: 0 }
+        ]
+      },
+      {
+        kategori: "Sosial",
+        pertanyaan: "Jika kamu melihat seorang teman di kelas diejek atau dikucilkan oleh teman lainnya, sikap yang tepat adalah...",
+        pilihan: [
+          { teks: "Ikut tertawa agar tidak menjadi sasaran berikutnya", skor: 0 },
+          { teks: "Mengajaknya bicara, memberi dukungan, dan melaporkan secara bijak ke guru", skor: 25 },
+          { teks: "Merekam kejadian tersebut untuk diunggah ke media sosial", skor: 0 }
+        ]
+      },
+      {
+        kategori: "Belajar",
+        pertanyaan: "Cara mengatur waktu belajar yang efektif saat banyak tugas rumah adalah...",
+        pilihan: [
+          { teks: "Mengerjakan semua tugas saat menit-menit terakhir sebelum dikumpulkan", skor: 0 },
+          { teks: "Membuat daftar prioritas mulai dari yang paling mendesak dan penting", skor: 25 },
+          { teks: "Menunggu suasana hati (mood) merasa ingin belajar", skor: 0 }
+        ]
+      },
+      {
+        kategori: "Karir",
+        pertanyaan: "Langkah terbaik dalam menentukan rencana kelanjutan studi atau cita-cita karir adalah...",
+        pilihan: [
+          { teks: "Mengenali bakat, minat, serta berkonsultasi dengan orang tua dan guru BK", skor: 25 },
+          { teks: "Hanya ikut-ikutan pilihan teman terdekat agar tetap bersama", skor: 0 },
+          { teks: "Memilih jurusan secara acak tanpa mencari tahu prospeknya", skor: 0 }
+        ]
+      }
+    ];
+
+    let indeksSoal = 0;
+    let totalSkor = 0;
+    let namaSiswa = "";
+    let kelasSiswa = "";
+
+    // Fungsi Mulai Kuis
+    function mulaiKuis() {
+      namaSiswa = document.getElementById("nama").value.trim();
+      kelasSiswa = document.getElementById("kelas").value.trim();
+
+      if (!namaSiswa || !kelasSiswa) {
+        alert("Silakan isi nama dan kelas terlebih dahulu!");
+        return;
+      }
+
+      indeksSoal = 0;
+      totalSkor = 0;
+
+      document.getElementById("screen-start").classList.add("hidden");
+      document.getElementById("screen-result").classList.add("hidden");
+      document.getElementById("screen-quiz").classList.remove("hidden");
+
+      tampilkanSoal();
+    }
+
+    // Menampilkan Soal Saat Ini
+    function tampilkanSoal() {
+      const soalSaatIni = daftarSoal[indeksSoal];
+
+      document.getElementById("soal-kategori").textContent = "Bidang " + soalSaatIni.kategori + ` (${indeksSoal + 1}/${daftarSoal.length})`;
+      document.getElementById("soal-teks").textContent = soalSaatIni.pertanyaan;
+
+      const kontainerPilihan = document.getElementById("pilihan-jawaban");
+      kontainerPilihan.innerHTML = "";
+
+      soalSaatIni.pilihan.forEach((pilihan) => {
+        const tombol = document.createElement("button");
+        tombol.className = "option-btn";
+        tombol.textContent = pilihan.teks;
+        tombol.onclick = () => pilihJawaban(pilihan.skor);
+        kontainerPilihan.appendChild(tombol);
+      });
+    }
+
+    // Logika Pemilihan Jawaban
+    function pilihJawaban(poin) {
+      totalSkor += poin;
+      indeksSoal++;
+
+      if (indeksSoal < daftarSoal.length) {
+        tampilkanSoal();
+      } else {
+        tampilkanHasil();
+      }
+    }
+
+    // Menampilkan Layar Skor
+    function tampilkanHasil() {
+      document.getElementById("screen-quiz").classList.add("hidden");
+      document.getElementById("screen-result").classList.remove("hidden");
+
+      document.getElementById("hasil-identitas").textContent = `${namaSiswa} (${kelasSiswa})`;
+      document.getElementById("hasil-skor").textContent = totalSkor;
+
+      let catatan = "";
+      if (totalSkor >= 75) {
+        catatan = "Hebat! Kamu memiliki pemahaman diri, sosial, dan cara belajar yang sangat matang. Pertahankan sikap positif ini!";
+      } else if (totalSkor >= 50) {
+        catatan = "Cukup baik. Ada beberapa bagian yang masih perlu dilatih kembali, seperti pengelolaan waktu belajar atau ketenangan emosi.";
+      } else {
+        catatan = "Jangan berkecil hati. Jadikan hasil ini kesempatan untuk belajar lebih banyak. Guru BK siap membantu dan berdiskusi kapan saja!";
+      }
+
+      document.getElementById("hasil-catatan").textContent = catatan;
+    }
+
+    // Mengulang Kuis
+    function ulangiKuis() {
+      document.getElementById("nama").value = "";
+      document.getElementById("kelas").value = "";
+      document.getElementById("screen-result").classList.add("hidden");
+      document.getElementById("screen-start").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
